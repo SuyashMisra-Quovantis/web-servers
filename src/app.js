@@ -1,18 +1,12 @@
+const path = require("path"); //core module for path handling
+
 const express = require("express"); //returns a function
 
 const app = express(); //creates an express application and returns it
 
-app.get("", (req, res) => {
-  res.send("Hello express");
-});
+const directoryPath = path.join(__dirname, "../public");
 
-app.get("/help", (req, res) => {
-  res.send("Help Page");
-});
-
-app.get("/about", (req, res) => {
-  res.send("<h1>About page</h1>");
-});
+app.use(express.static(directoryPath));
 
 app.get("/weather", (req, res) => {
   res.send({
