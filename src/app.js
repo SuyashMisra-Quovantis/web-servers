@@ -20,17 +20,19 @@ app.set("views", viewPath); //sets express to fetch hbs templates from viewPath 
 
 app.use(express.static(directoryPath)); //directory to load static webpages
 
+const name = "Suyash Misra";
+
 app.get("", (req, res) => {
   res.render("index", {
     title: "Welcome to homepage",
-    name: "Suyash Misra",
+    name,
   }); //renders the template, second argument sends dynamic content to the template in first argument
 });
 
 app.get("/about", (req, res) => {
   res.render("about", {
     title: "About Me",
-    name: "Suyash Misra",
+    name,
   });
 });
 
@@ -38,7 +40,7 @@ app.get("/help", (req, res) => {
   res.render("help", {
     title: "Help page",
     message: "Here to help",
-    name: "Suyash Misra",
+    name,
   });
 });
 
@@ -46,6 +48,22 @@ app.get("/weather", (req, res) => {
   res.send({
     forecast: "It is raining",
     location: "Kanpur",
+  });
+});
+
+app.get("/help/*", (req, res) => {
+  res.render("error", {
+    title: "404",
+    errorMessage: "Help article not found!",
+    name,
+  });
+});
+
+app.get("*", (req, res) => {
+  res.render("error", {
+    title: "404",
+    errorMessage: "Page not found",
+    name,
   });
 });
 
