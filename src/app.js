@@ -26,6 +26,49 @@ app.use(bodyParser.json()); //A new body object containing the parsed data is po
 
 const name = "Suyash Misra";
 
+app.use((req, res, next) => {
+  console.log("Logged from middleware");
+  next();
+});
+
+//middleware for specific route
+app.use("/about", (req, res, next) => {
+  console.log("In about route");
+  next();
+});
+
+//multiple middleware functions
+app.use(
+  "/help",
+  (req, res, next) => {
+    console.log("In Help route");
+    next();
+  },
+  (req, res, next) => {
+    console.log("In help second middleware");
+    next();
+  }
+);
+
+/*
+app.get("/", function (req, res) {
+  throw new Error("BROKEN"); // Express will catch this on its own.
+});
+*/
+
+/*
+//Asynchronous errors need to be caught and passed to express for processing
+app.get("/", function (req, res, next) {
+  setTimeout(function () {
+    try {
+      throw new Error("BROKEN");
+    } catch (err) {
+      next(err);
+    }
+  }, 100);
+});
+*/
+
 app.get("", (req, res) => {
   res.render("index", {
     title: "Welcome to homepage",
