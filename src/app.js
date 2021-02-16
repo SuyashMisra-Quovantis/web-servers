@@ -1,8 +1,14 @@
 const path = require("path"); //core module for path handling
+
 const hbs = require("hbs");
+
 const bodyParser = require("body-parser");
 
+const cookieParser = require("cookie-parser");
+
 const express = require("express"); //returns a function
+
+const session = require("express-session");
 
 const app = express(); //creates an express application and returns it
 
@@ -20,12 +26,17 @@ app.set("views", viewPath); //sets express to fetch hbs templates from viewPath 
 
 app.use(express.static(directoryPath)); // directory to load static webpages, app.use() binds middleware to the application
 
+app.use(cookieParser());
+
+app.use(session({ secret: "session secret" }));
+
 app.use(bodyParser.urlencoded({ extended: true })); //A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body). This object will contain key-value pairs, where the value can be a string or array (when extended is false), or any type (when extended is true).
 
 app.use(bodyParser.json()); //A new body object containing the parsed data is populated on the request object after the middleware (i.e. req.body).
 
 const name = "Suyash Misra";
 
+//doubt: why is this called at the starting and ending
 app.use((req, res, next) => {
   console.log("Logged from middleware");
   next();
@@ -57,6 +68,29 @@ app.get("/", function (req, res) {
 */
 
 /*
+For errors returned from asynchronous functions invoked by route handlers and middleware, you must pass them to the next() function, where Express will catch and process them.
+
+app.get('/', function (req, res, next) {
+  fs.readFile('/file-does-not-exist', function (err, data) {
+    if (err) {
+      next(err) // Pass errors to Express.
+    } else {
+      res.send(data)
+    }
+  })
+})
+*/
+
+/*
+Starting with Express 5, route handlers and middleware that return a Promise will call next(value) automatically when they reject or throw an error. 
+
+app.get("/weather/:id", async function (req, res, next) {
+  var weather = await getWeatherById(req.params.id);
+  res.send(user);
+});
+*/
+
+/*
 //Asynchronous errors need to be caught and passed to express for processing
 app.get("/", function (req, res, next) {
   setTimeout(function () {
@@ -68,13 +102,41 @@ app.get("/", function (req, res, next) {
   }, 100);
 });
 */
-
-app.get("", (req, res) => {
-  res.render("index", {
-    title: "Welcome to homepage",
-    name,
-  }); //renders the template, second argument sends dynamic content to the template in first argument
+/*
+//sessions
+app.get("", (req, res, next) => {
+  if (req.session.page_views) {
+    req.session.page_views++;
+    res.send("You visited this page " + req.session.page_views + " times");
+  } else {
+    req.session.page_views = 1;
+    res.send("Welcome to this page for the first time!");
+  }
+  next();
 });
+*/
+
+//setting cookies
+app.get(
+  "",
+  (req, res, next) => {
+    res.cookie("name", "express"); //Sets name = express
+    console.log("Cookies: ", req.cookies);
+    next();
+  },
+  (req, res, next) => {
+    res.render("index", {
+      title: "Welcome to homepage",
+      name,
+    }); //renders the template, second argument sends dynamic content to the template in first argument
+    next();
+  },
+  (req, res) => {
+    // res.clearCookie("name");
+    // res.send("cookie name cleared");
+    console.log("Cookies: ", req.cookies);
+  }
+);
 
 app.get("/about", (req, res) => {
   res.render("about", {
